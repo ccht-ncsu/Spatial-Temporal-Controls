@@ -6,16 +6,16 @@
 ---
 
 ## Overview
-This code helps with the process of determining which ADCIRC mesh element and PE each observation station belongs to based on its longitude and latitude. It removes the need for manual station placement and ensures all stations are placed correctly based on spatial proximity to the mesh. The code generates local `fort.26` files for parallel partitions and an optional `global_fort.26` containing all stations.
+This script identifies which ADCIRC mesh element and Processing Element (PE) partition owns specific observation stations based on their longitude/latitude. It automates the creation of localized `fort.26` files for parallel partitions, ensuring that each processor only tracks the stations physically located within its sub-domain.
 
 ---
 
 ## Intended Use Cases
 Use this script when:
-- You have a list of observation stations (lon/lat) that must be included in ADCIRC spectral output (`fort.26`).
-- You are working with a parallel ADCIRC run with many PE folders.
-- You want to avoid manually identifying which element or PE a station belongs to.
-- You need consistent, reproducible station placement across runs, meshes, or large station datasets.
+- Mapping a list of global station coordinates to specific ADCIRC parallel partitions.
+- Generating partition-specific `fort.26` files before high-performance computing runs.
+- Handling nodes near partition boundaries where a station might technically sit between multiple PEs.
+- Standardizing spectral output formatting across large-scale mesh datasets.
 
 ---
 ## Operational Modes
@@ -40,9 +40,9 @@ The script can be executed via the command line with flexible argument passing:
 - `partmesh.txt` – Partition mapping file (links node IDs to PE numbers).
 - `station_locations.csv` – Input coordinates. Expected format:
   ```csv
-  Station,Longitude,Latitude
-  ST01,-78.5432,34.1234
-  ST02,-78.6123,34.0876
+   Station,Longitude,Latitude
+   16941,-76.334461,30.757137
+   17172,-76.62709,30.970871
   ```
 - `fort.26` – Template file used as the base for the header and insertion anchors.
 
@@ -69,6 +69,13 @@ The script can be executed via the command line with flexible argument passing:
 **Local `fort.26` Files**
   - Written to `PE####/fort.26` folders.
   - Contains localized `POINTS` and `SPECOUT` blocks.
+
+      Examples of new lines added: 
+      ```
+      POINTS 'bnd16941' -76.334461 30.757137
+      ...
+      SPECout 'bnd16941' SPEC2D ABSolute S 'bnd16941.spc' OUTput 20181006.000000 1800 Sec
+      ```
 
 **(Optional) Global `fort.26`**
   - Includes all `POINTS` and `SPECOUT` lines combined into one file.
