@@ -116,9 +116,9 @@ This approach is typically used when:
 
 The following image displays what a modified `fort.13` file would include for `swan_local_control`. 
 
-<img width="975" height="567" alt="image" src="https://github.com/user-attachments/assets/ec032387-7972-469a-ac0a-32f33439d9b4" />
+<img width="1716" height="600" alt="Untitled (5 72 x 2 in) (1)" src="https://github.com/user-attachments/assets/beaeb4a4-6765-4a65-b489-d7dd9b2b31a6" />
 
-*Figure 1. Active SWAN nodes within the EC95 ADCIRC mesh based on user-specified polygon. Green Colored triangular elements indicate PE partitions, while black markers show the spatial distribution of the 425 observation stations used in the test case.*
+*Figure 1. Active SWAN nodes within the EC95 ADCIRC mesh based on user-specified polygon. Green elements correspond to areas of the mesh where SWAN is activated and red dots represent nodes where internal source spectra are applied as 'boundary conditions' for the partial domain.*
 
 
 ---
