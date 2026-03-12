@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-This script identifies which ADCIRC mesh element and Processing Element (PE) partition owns specific observation stations based on their longitude/latitude. It automates the creation of localized `fort.26` files for parallel partitions, ensuring that each processor only tracks the stations physically located within its sub-domain.
+This script identifies which ADCIRC mesh element and Processing Element (PE) partition owns specific observation stations based on their longitude/latitude. It creates localized `fort.26` files for parallel partitions, ensuring that each processor only tracks the stations physically located within its sub-domain.
 
 ---
 
