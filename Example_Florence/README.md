@@ -66,40 +66,37 @@ In this configuration:
 Run the model using the SWAN+ADCIRC executable:
 ```bash
 padcswan
+```
 ---
 
-## Case 2: Full Domain Simulation
+## Case 2: Partial Time Simulation
 
-The default configuration represents a **full domain, full time simulation**.
+This configuration represents a **full spatial domain, partial time simulation**.
 
 In this configuration:
 
 - SWAN runs over the **entire ADCIRC mesh**
-- The simulation covers the **entire storm duration**
+- The simulation covers a **specified timeframe** within the storm duration
 
-Run the model using the SWAN+ADCIRC executable:
-```bash
-padcswan
+---
 
-## Methodology
+## Case 3: Partial Spatial Domain Simulation
 
-### Step 1: User Inputs
-- Read required files and user-defined parameters
-- Detect whether a station CSV is provided
+This configuration represents a **partial spatial domain, full time simulation**.
 
-### Step 2: Polygon Creation
-- Define polygon in lon/lat
-- Convert to shapely geometry (optionally exported as a shapefile)
+In this configuration:
 
-### Step 3: Mesh Parsing
-- Read nodes and elements from `fort.14`
-- Identify boundary segments and neighboring node relationships
+- SWAN runs over a **specified spatial domain**
+- Internal sources of wave spectra can be applied at SWAN domain boundaries to account for offshore swell energy
+- The simulation runs SWAN and ADCIRC for one uniform timeframe 
 
-### Step 4: Polygon Containment Test
-- Determine which nodes fall inside the polygon
-- Separate nodes inside vs. outside the region of interest
+This configuration can be used in a variety ways, depending on the source of wave spectra being applied. 
 
-### Step 5: Internal Source Node Identification
+---
+
+## Case 4: Combined Partial Spatial and Temporal Simulation
+
+
 
 #### Case 1: No CSV Provided (Geometry-Based)
 - Internal source nodes are defined as:
@@ -119,12 +116,7 @@ This approach is typically used when:
 - Boundary spectra already exist
 - Stations are intended to act as **internal SWAN forcing points** in an SLC simulation
 
-### Step 6: Write Updated `fort.13`
-- Append the `swan_local_control` nodal attribute
-- Preserve existing nodal attributes and formatting
 
-### Step 7: Write Output CSV
-- Save internal source node IDs and associated metadata
 
 ---
 
