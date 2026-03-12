@@ -9,27 +9,6 @@
 # 
 # INPUTS: directory location- fort.13, partmesh.txt, fort.26 
 #
-# Full Procedure Summary:
-#           --Create a GeoDataFrame from a SWAN+ADCIRC mesh net CDF file,
-#           that can be later input into ArcGIS Pro.
-#           --Create polygons based on longitude and latitude lists
-#           and convert these to shapefiles.
-#           --Add the GeoDataFrame, polygon shapefiles, and a Hurricane Florence
-#           best track shapefile into ArcGIS using arcpy mapping.
-#           --Prompt the user to choose a polygon out of the three defualts
-#           or to draw their own which will be used for the Fortran file
-#           manipulation.
-#           --Read the fort.14 mesh domain file, which contains SWAN+ADCIRC's
-#           mesh domain (x and y coordinates, and node numbers). Iterate through
-#           the list of nodes and determine which nodes lie within the selceted
-#           polygon and which nodes do not.
-#           --Read the fort.13 file, which contains nodal attributes for each
-#           node in the mesh. Write a new fort.13 file with a new nodal attribute
-#           for SWAN_on or off based on which nodes are within the selected polygon.
-#           --Once the file is saved, create a map with the mesh GeoDataFrame,
-#           best track of Hurricane Florence, and the selected polygon.
-#           --Report the success of the process with the map png image to a HTML report.
-#
 #
 # Main Steps:
 # Step 1: Create a dictionary based on internal source nodes from fort.13 and store side number.
@@ -44,27 +23,23 @@
 #
 # Step 6: Copy the new fort.26 files to the corresponding PE folders. 
 #
-# Software Requirements: Python libraries os and collections must be installed.
+# Software Requirements: Python libraries os, collections, and shutil must be installed.
 #
-#
-# Usage: base_directory polygon_choice
-#
-# Example input: C:\Users\nicol\Documents\ArcGIS\Projects\swm_modernization poly1
 
 
 # import libraries and packages
 import os
 from collections import defaultdict
+import shutil
+
 
 #-----------------
 # 
 
-
-
 def extract_internal_sources(fort13_file, partmesh_file):
     internal_sources = {}
 
-    # First: extract from fort.13
+    # extract from fort.13
     with open(fort13_file, 'r') as f:
         lines = f.readlines()
 
@@ -163,16 +138,14 @@ for pe, nodes in pe_nodes.items():
 
 
 
-
-    # Format destination folder like PE002
+    # Format destination folder (i.e. PE0002)
     pe_folder = f"PE{pe:04d}"
-    #os.makedirs(pe_folder, exist_ok=True)  # Create folder if it doesn't exist
 
     # Destination path
     destination_file = os.path.join(pe_folder, "fort.26")
 
     # Copy the generated file into the folder
-    import shutil
     shutil.copy(output_fort_26_file, destination_file)
 
     print(f"Copied to {destination_file}")
+
