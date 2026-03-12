@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-This script identifies and assigns *selective SWAN local control regions* and *internal source nodes* within an ADCIRC `fort.14` mesh using a user-defined polygon. It produces an updated `fort.13` file containing a new nodal attribute (`swan_local_control`) and a CSV summarizing the internal source node information.
+This script identifies internal source nodes based on the `fort.13` and assigns *selective SWAN local control regions* and *internal source nodes* within an ADCIRC `fort.14` mesh using a user-defined polygon. It produces an updated `fort.13` file containing a new nodal attribute (`swan_local_control`) and a CSV summarizing the internal source node information.
 
 
 ---
