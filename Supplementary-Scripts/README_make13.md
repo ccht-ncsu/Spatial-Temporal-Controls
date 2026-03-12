@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-This script identifies and assigns *selective SWAN local control regions* and *internal source nodes* within an ADCIRC `fort.14` mesh using a user-defined polygon. It produces an updated `fort.13` file containing a new nodal attribute (`swan_local_control`) and a CSV summarizing the internal source node information.
+This script identifies and assigns *selective regions of the mesh to run SWAN* and *internal source nodes* (as locations to apply spectral boundary conditions) using a user-defined polygon. It produces an updated nodal attribute file (`fort.13`) containing a new attribute (`swan_local_control`) identifying active and inactive nodes and nodes to apply spectral sources at and a CSV summarizing this internal source node information.
 
 
 ---
@@ -109,6 +109,17 @@ This approach is typically used when:
 
 ### Step 7: Write Output CSV
 - Save internal source node IDs and associated metadata
+
+---
+
+## Expected Results 
+
+The following image displays what a modified `fort.13` file would include for `swan_local_control`. 
+
+<img width="975" height="567" alt="image" src="https://github.com/user-attachments/assets/ec032387-7972-469a-ac0a-32f33439d9b4" />
+
+*Figure 1. Active SWAN nodes within the EC95 ADCIRC mesh based on user-specified polygon. Green Colored triangular elements indicate PE partitions, while black markers show the spatial distribution of the 425 observation stations used in the test case.*
+
 
 ---
 
