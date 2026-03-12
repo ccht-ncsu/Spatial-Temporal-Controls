@@ -122,6 +122,10 @@ This approach is typically used when:
 
 ## Expected Results
 
+
+<img width="1716" height="600" alt="Untitled (5 72 x 2 in)" src="https://github.com/user-attachments/assets/92b1a9b5-0b26-428d-a90e-14ff33b8305e" />
+*Figure 1. Significant wave heights for three varying spatial domains as Hurricane Florence is making landfall.*
+
 ---
 
 ## Discussion
