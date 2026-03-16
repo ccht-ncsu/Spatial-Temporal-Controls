@@ -1,4 +1,4 @@
-# Hurricane Florence (2018) Simulation using Varying Spatial and Temporal SWAN Domains
+# Hurricane Florence (2018) using Varying Spatial and Temporal SWAN Domains
 
 **Author:** Nicole Arrigo  \
 **Last Updated:** March 2026
@@ -7,11 +7,11 @@
 
 ## Overview
 
-The objective of this example is to demonstrate how to run **SWAN+ADCIRC simulations using the EC95 mesh** for **Hurricane Florence (2018)** to explore different spatial and temporal modeling configurations.
+The objective of this example is to demonstrate how to run **SWAN+ADCIRC simulations** using the EC95 mesh for Hurricane Florence (2018) to explore **different spatial and temporal modeling configurations**.
 
 This example illustrates how the same model setup can be adapted to run:
 
-- Case 1 - Full SWAN spatial and temportal domain simulations
+- Case 1 - Full SWAN spatial and temportal domain simulations (typical SWAN+ADCIRC configuration) 
 - Case 2 - Partial time simulations 
 - Case 3 - Partial spatial domain simulations using SWAN Local Control (SLC)
 - Case 4 - Combined partial domain and partial time simulations
@@ -33,20 +33,12 @@ This example includes the following input files:
 
 - `fort.14` – ADCIRC mesh file (EC95 mesh)
 - `fort.13` – ADCIRC nodal attributes file
-- `fort.15` – ADCIRC model control file
+- `fort.15` – ADCIRC model control file (*Note that the final line of this file includes the new namelist needed for temporal controls*)
 - `fort.22` – Hurricane wind and pressure forcing file
 - `fort.26` – SWAN model control file
 - `swaninit` – SWAN initialization file
 
 These files provide a complete base configuration for running **SWAN+ADCIRC simulations of Hurricane Florence (2018)**.
-
----
-The workflow supports **two operational modes** for defining internal source nodes:
-
-1. **Geometry-based (no CSV provided):** Internal source nodes are identified using neighboring nodes of partial domain.
-2. **Station-based (CSV provided):** Internal source nodes are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station.
-
-This enables flexible SWAN simulations, allowing for the **SWAN Local Control (SLC)** attribute to enable partial-domain SWAN runs and interior boundry conditions (internal sources).
 
 ---
 
@@ -78,6 +70,24 @@ In this configuration:
 - SWAN runs over the **entire ADCIRC mesh**
 - The simulation covers a **specified timeframe** within the storm duration
 
+There are two variations that need to be made to use the temporal controls.
+1. On the ADCIRC input side - the namelist RunStartTime at the end of the `fort.15` must contain the start of the ADCIRC simulation.
+
+```bash
+&SWANTimeControl RunStartDateTime='20180907.000000' /
+```
+
+2. On the SWAN input side - the COMPUTE time in the `fort.26` can be altered to the desired time range.
+- To run this simulation for 4 out of the 9 days ADCIRC is running, change the COMPUTE time from 20180907.0000 to 20180912.0000.
+
+```bash
+TEST 1,0
+COMPUTE 20180912.000000 1200 SEC 20180916.000000
+STOP
+```
+
+This will result in SWAN running for four of the nine days that ADCIRC runs for, leading to faster simulations.
+
 ---
 
 ## Case 3: Partial Spatial Domain Simulation
@@ -92,13 +102,15 @@ In this configuration:
 
 This configuration can be used in a variety ways, depending on the source of wave spectra being applied. 
 
----
+The workflow supports **two operational modes** for defining internal source nodes:
 
-## Case 4: Combined Partial Spatial and Temporal Simulation
+a. **Geometry-based (no CSV provided):** Internal source nodes are identified using neighboring nodes of partial domain.
+b. **Station-based (CSV provided):** Internal source nodes are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station.
+
+This enables flexible SWAN simulations, allowing for the **SWAN Local Control (SLC)** attribute to enable partial-domain SWAN runs and interior boundry conditions (internal sources).
 
 
-
-#### Case 1: No CSV Provided (Geometry-Based)
+#### Case 3a: No CSV Provided (Geometry-Based)
 - Internal source nodes are defined as:
   - Nodes **inside** the polygon
   - That share at least one element neighbor **outside** the polygon
@@ -106,15 +118,23 @@ This configuration can be used in a variety ways, depending on the source of wav
 This approach is typically used when:
 - Running a **full-domain SWAN simulation**
 - Exporting internal source spectra for use in a **partial-domain SWAN model**
+- Escpecially useful in engineering design when running repeated scenarios for design alternatives
 
-#### Case 2: CSV Provided (Station-Based)
+#### Case 3b: CSV Provided (Station-Based)
 - Each station location (lon/lat) is snapped to the nearest mesh node
 - Nearest-node selection uses squared-distance minimization in lon/lat space
-- Node order follows the CSV order
 
 This approach is typically used when:
-- Boundary spectra already exist
+- Boundary spectra already exist from another wave model, simulation, or buoy
 - Stations are intended to act as **internal SWAN forcing points** in an SLC simulation
+
+
+---
+
+## Case 4: Combined Partial Spatial and Temporal Simulation
+
+
+
 
 
 
