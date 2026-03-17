@@ -6,8 +6,11 @@
 ---
 
 ## Overview
-This script identifies internal source nodes based on the `fort.13` and assigns *selective SWAN local control regions* and *internal source nodes* within an ADCIRC `fort.14` mesh using a user-defined polygon. It produces an updated `fort.13` file containing a new nodal attribute (`swan_local_control`) and a CSV summarizing the internal source node information.
+This script prepares *SWAN internal source boundary commands* for parallel SWAN+ADCIRC simulations. It reads internal source node information from the ADCIRC nodal attribute file (`fort.13`) and assigns each source node to its corresponding *subdomain partition (PE folder)* after domain decomposition has been run using the `partmesh.txt` file.
 
+For each subdomain folder, the script generates a *local SWAN input file (`fort.26`)* containing the required `BOUndspec` commands that specify spectral forcing. The script then copies the generated files into the corresponding subdomain directories.
+
+This automates the preparation of *local SWAN input files* when running parallel simulations with internal source spectra.
 
 ---
 
@@ -15,17 +18,6 @@ This script identifies internal source nodes based on the `fort.13` and assigns 
 
 - Running SWAN on a *partial domain* of a larger ADCIRC mesh
 - Applying **input boundary spectra** only along selected internal sources
-- Generating internal source locations for **SLC-based SWAN simulations**
-
----
-
-The workflow supports **two operational modes** for defining internal source nodes:
-
-1. **Geometry-based (no CSV provided):** Internal source nodes are identified using neighboring nodes of partial domain.
-2. **Station-based (CSV provided):** Internal source nodes are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station.
-
-This enables flexible SWAN simulations, allowing for the **SWAN Local Control (SLC)** attribute to enable partial-domain SWAN runs and interior boundry conditions (internal sources).
-
 
 ---
 
@@ -41,55 +33,56 @@ This enables flexible SWAN simulations, allowing for the **SWAN Local Control (S
 
 - **Updated `fort.26` Files**
   - For each subdomain partition (PE folder), the script generates a customized `fort.26` file containing the appropriate internal source boundary commands for the nodes assigned to the specific partition:
-BOUndspec SIDE <side> CONstant FILE 'bnd<node>.spc' 1
+ 
+```bash
 BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
-
+BOUndspec SIDE <side> CONstant FILE 'bnd<node>.spc' 1
+```
 ---
 
 ## Methodology
 
-### Step 1: User Inputs
-- Read required files and user-defined parameters
-- Detect whether a station CSV is provided
 
-### Step 2: Polygon Creation
-- Define polygon in lon/lat
-- Convert to shapely geometry (optionally exported as a shapefile)
+### Step 1: Extract Internal Source Nodes
+- Reads the `swan_local_control` attribute from the `fort.13` file and identifies nodes marked as internal sources.
 
-### Step 3: Mesh Parsing
-- Read nodes and elements from `fort.14`
-- Identify boundary segments and neighboring node relationships
+For each source node, the script extracts and stores:
+- Node ID
+- Boundary side number
 
-### Step 4: Polygon Containment Test
-- Determine which nodes fall inside the polygon
-- Separate nodes inside vs. outside the region of interest
+### Step 2: Assign Nodes Subdomain Folders
+- Using `partmesh.txt`, each internal source node is mapped to its corresponding subdomain (PE folder) and stored.
 
-### Step 5: Internal Source Node Identification
+### Step 3: Group Nodes by Subdomain Folder
+- Internal source nodes are grouped according to their assigned subdmain folder.
+- This ensures each partition contains only the nodes belonging to it.
 
-#### Case 1: No CSV Provided (Geometry-Based)
-- Internal source nodes are defined as:
-  - Nodes **inside** the polygon
-  - That share at least one element neighbor **outside** the polygon
 
-This approach is typically used when:
-- Running a **full-domain SWAN simulation**
-- Exporting internal source spectra for use in a **partial-domain SWAN model**
+### Step 4: Generate Boundary Commands
+- For each internal source node, the script generates a SWAN boundary command using the side numbers previously stored:
+```bash
+BOUndspec SIDE <side> CONstant FILE 'bnd<node>.spc' 1
+```
+- Each node references a spectral file named:
+```bash
+bnd<node>.spc
+```
 
-#### Case 2: CSV Provided (Station-Based)
-- Each station location (lon/lat) is snapped to the nearest mesh node
-- Nearest-node selection uses squared-distance minimization in lon/lat space
-- Node order follows the CSV order
+### Step 5: Create `fort.26` files 
+- For each PE folder, a new SWAN input file (`fort.26`) is created with following information inserted:
 
-This approach is typically used when:
-- Boundary spectra already exist
-- Stations are intended to act as **internal SWAN forcing points** in an SLC simulation
+1. Spectral shape definition
+2. Internal source boundary commands for all nodes within partition
+3. The original content from the SWAN input file
 
-### Step 6: Write Updated `fort.13`
-- Append the `swan_local_control` nodal attribute
-- Preserve existing nodal attributes and formatting
+- This preserves the structure of the original `fort.26` file while adding the required boundary inputs.
 
-### Step 7: Write Output CSV
-- Save internal source node IDs and associated metadata
+### Step 6: Distribute Files to Subdomain Folders
+- Each generated `fort.26` file is copied into its corresponding subdomain directory:
+```bash
+PE####/fort.26
+```
+- This ensures each partition runs with the SWAN boundary commands corresponding to *only the internal sources located on each partition*.
 
 ---
 
@@ -101,7 +94,7 @@ The following Python libraries are required:
 - `collections`
 - `shutil`
 
-These libraries are included in the *standard Python library* and do not require additional installation.
+- These libraries are included in the *standard Python library* and do not require additional installation.
 ---
 
 ## Contact
