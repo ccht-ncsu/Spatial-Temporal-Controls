@@ -100,42 +100,73 @@ In this configuration:
 - Internal sources of wave spectra can be applied at SWAN domain boundaries to account for offshore swell energy
 - The simulation runs SWAN and ADCIRC for one uniform timeframe 
 
-This configuration can be used in a variety ways, depending on the source of wave spectra being applied. 
+This configuration enables efficient simulations focused on a **region of interest** while still accounting for offshore wave conditions.
 
-The workflow supports **two operational modes** for defining internal source nodes:
+This workflow supports **two approaches**, depending on whether internal source spectra already exist.
 
-a. **Geometry-based (no CSV provided):** Internal source nodes are identified using neighboring nodes of partial domain.
-b. **Station-based (CSV provided):** Internal source nodes are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station.
+### Case 3a: Generate Internal Sources from a Full Domain Simulation
 
-This enables flexible SWAN simulations, allowing for the **SWAN Local Control (SLC)** attribute to enable partial-domain SWAN runs and interior boundry conditions (internal sources).
-
-
-#### Case 3a: No CSV Provided (Geometry-Based)
-- Internal source nodes are defined as:
-  - Nodes **inside** the polygon
-  - That share at least one element neighbor **outside** the polygon
-
-This approach is typically used when:
-- Running a **full-domain SWAN simulation**
-- Exporting internal source spectra for use in a **partial-domain SWAN model**
+Use this approach if **no spectra currently exist**.
 - Escpecially useful in engineering design when running repeated scenarios for design alternatives
 
-#### Case 3b: CSV Provided (Station-Based)
-- Each station location (lon/lat) is snapped to the nearest mesh node
-- Nearest-node selection uses squared-distance minimization in lon/lat space
+#### Step 1: Define Partial Domain
+- Run `make13.py` with a user-defined polygon  
+- Outputs:
+  - Modified `fort.13` with nodal attribute (`swan_local_control`) defining active nodes and internal source nodes
+  - `station_locations.csv` containing internal source node locations (at every new 'boundary' node of partial domain)  
 
-This approach is typically used when:
-- Boundary spectra already exist from another wave model, simulation, or buoy
-- Stations are intended to act as **internal SWAN forcing points** in an SLC simulation
+#### Step 2: Export Spectra from Full Domain Simulation
+- Run a **full domain SWAN+ADCIRC simulation**
+- Use `adcprep` as usual
+- Use `station_locations.csv` with `update26.py` to:
+  - Insert local commands into SWAN input file (`fort.26`) to **output spectra at internal source nodes**
+- This produces spectral files: bnd<xxxx>.spc
 
+#### Step 3: Run Partial Domain Simulation
+- Use the modified `fort.13` from Step 1  
+- Include the generated spectral files (`bndXXXX.spc`)  
+- Run `adcprep`  
+- Run `source_prep.py` to:
+  - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
+- Run:
+```bash
+padcswan
+```
+
+### Case 3b: Use Predefined Internal Source Locations and Spectra 
+
+Use this approach if **spectra already exist** (e.g., from another model, simulation, or observations).
+
+#### Step 1: Define Internal Sources and Patial Domain
+- Run `make13.py` with a user-defined polygon and internal_sources.csv with station locations (lon/lat). 
+- Outputs:
+  - Modified `fort.13` with nodal attribute (`swan_local_control`) defining active nodes and internal source nodes
+
+#### Step 2: Run Partial Domain Simulation
+- Use the modified `fort.13` from Step 1  
+- Include spectral files to be used as input sources (`bndXXXX.spc`)  
+- Run `adcprep`  
+- Run `source_prep.py` to:
+  - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
+- Run:
+```bash
+padcswan
+```
+
+Both simulations will result in a partial spatial domain with spectral boundary forcings to account for offshore swell. 
 
 ---
 
 ## Case 4: Combined Partial Spatial and Temporal Simulation
 
+This configuration combines both opitmizations and represents a **partial spatial domain, reduced time simulation**.
 
-
-
+To run this configuration:
+- Define the SWAN compute time in the SWAN input file (`fort.26`)
+- Use make13.py with the desired spatial region and intrnal source settings (following the steps to obtain source spectra from a full domain simulation, if needed).
+- With the modified nodal attribute file (`fort.13`), input spectra, and timing updated SWAN input file (`fort.26`), run ADCPREP to decompose the mesh.
+- Next, run source_prep.py to ditribute the boundary spectra commands locally.
+- Run PADCSWAN for the partial spatial and temporal SWAN domain.   
 
 
 ---
@@ -146,9 +177,17 @@ This approach is typically used when:
 <img width="1716" height="600" alt="Untitled (5 72 x 2 in)" src="https://github.com/user-attachments/assets/92b1a9b5-0b26-428d-a90e-14ff33b8305e" />
 *Figure 1. Significant wave heights for three varying spatial domains as Hurricane Florence is making landfall.*
 
+This example demonstrates a 37% speedup between the full and partial simulations. 
+
 ---
 
 ## Discussion
+This example demonstrates the flexibility of SWAN+ADCIRC simulations and how they can now be configured to balance accuracy and computational efficiency.
+
+Key advantages of the workflows shown here include:
+- Reducing model runtime
+- Allowing targeted wave simulations in regions of interest
+- Enabling reuse of spectra from larger simulations
 
 ---
 
