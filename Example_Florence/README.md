@@ -11,10 +11,10 @@ The objective of this example is to demonstrate how to run **SWAN+ADCIRC simulat
 
 This example illustrates how the same model setup can be adapted to run:
 
-- Case 1 - Full SWAN spatial and temportal domain simulations (default SWAN+ADCIRC configuration) 
+- Case 1 - Full SWAN spatial and temporal domain simulations (default SWAN+ADCIRC configuration) 
 - Case 2 - Partial time simulations 
-- Case 3 - Partial spatial domain simulations using SWAN Local Control (SLC)
-- Case 4 - Combined partial domain and partial time simulations
+- Case 3 - Partial spatial domain simulations 
+- Case 4 - Combined partial spatial and temporal domain simulations
 
 These workflows can be used to **reduce computational cost** while maintaining accurate wave predictions in coastal regions.
 
@@ -22,13 +22,14 @@ These workflows can be used to **reduce computational cost** while maintaining a
 
 ## Intended Use Cases
 
-- Simulating waves nearshore on a *partial domain* of a larger ADCIRC mesh
-- Outputting wave spectra and applying these as **internal source spectra** along a partial domain
-- Simulating waves for a portion of the time that circulation is simulated 
+- Simulating waves for a portion of the time that circulation is simulated (Case 2 and Case 4)
+- Simulating waves nearshore on a *partial domain* of a larger ADCIRC mesh (Case 3 and Case 4)
+  - Outputting wave spectra and applying these as **internal source spectra** along a partial domain
 
 ---
 ## Files Included
 
+#### Input Files
 This example includes the following input files:
 
 - `fort.14` – ADCIRC mesh file (EC95 mesh)
@@ -39,6 +40,13 @@ This example includes the following input files:
 - `swaninit` – SWAN initialization file
 
 These files provide a complete base configuration for running **SWAN+ADCIRC simulations of Hurricane Florence (2018)**.
+
+#### Output Files
+The following output files should be produced when running through the example:
+
+- `modified_fort.13` - ADCIRC nodal attributes file with the new attribute SWAN Local Control to identify inactive nodes and internal source nodes (Case 3).
+- `station_locations.csv` - list of internal source node locations where spectra should be exported.
+
 
 ---
 
