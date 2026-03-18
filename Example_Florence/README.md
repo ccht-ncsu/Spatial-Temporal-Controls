@@ -11,7 +11,7 @@ The objective of this example is to demonstrate how to run **SWAN+ADCIRC simulat
 
 This example illustrates how the same model setup can be adapted to run:
 
-- Case 1 - Full SWAN spatial and temportal domain simulations (typical SWAN+ADCIRC configuration) 
+- Case 1 - Full SWAN spatial and temportal domain simulations (default SWAN+ADCIRC configuration) 
 - Case 2 - Partial time simulations 
 - Case 3 - Partial spatial domain simulations using SWAN Local Control (SLC)
 - Case 4 - Combined partial domain and partial time simulations
@@ -46,7 +46,7 @@ Compile or load the SWAN+ADCIRC executable as appropriate for your system.
 
 ---
 
-## Case 1: Full Domain Simulation
+## Case 1: Full Domain Simulation - Default
 
 The default configuration represents a **full domain, full time simulation**.
 
@@ -70,14 +70,17 @@ In this configuration:
 - SWAN runs over the **entire ADCIRC mesh**
 - The simulation covers a **specified timeframe** within the storm duration
 
+
+This control has been added to give flexibility to the user to simulate SWAN for a **unique timeframe** within the ADCIRC simulation.
+
 There are two variations that need to be made to use the temporal controls.
-1. On the ADCIRC input side - the namelist RunStartTime at the end of the `fort.15` must contain the start of the ADCIRC simulation.
+1. On the ADCIRC input side - the namelist SWANTimeControl must be used and the RunStartDateTime must be set with the start of the ADCIRC simulation at the end of the ADCIRC model control file (`fort.15`).
 
 ```bash
 &SWANTimeControl RunStartDateTime='20180907.000000' /
 ```
 
-2. On the SWAN input side - the COMPUTE time in the `fort.26` can be altered to the desired time range.
+2. On the SWAN input side - the COMPUTE time in the SWAN input file (`fort.26`) can be altered to the desired time range.
 - To run this simulation for 4 out of the 9 days ADCIRC is running, change the COMPUTE time from 20180907.0000 to 20180912.0000.
 
 ```bash
@@ -86,7 +89,7 @@ COMPUTE 20180912.000000 1200 SEC 20180916.000000
 STOP
 ```
 
-This will result in SWAN running for four of the nine days that ADCIRC runs for, leading to faster simulations.
+This will result in SWAN running for four of the nine days that ADCIRC runs for, leading to faster wall clock run times of simulations.
 
 ---
 
@@ -110,7 +113,7 @@ Use this approach if **no spectra currently exist**.
 - Escpecially useful in engineering design when running repeated scenarios for design alternatives
 
 #### Step 1: Define Partial Domain
-- Run `make13.py` with a user-defined polygon  
+- Run `make13.py` with a user-defined polygon of the region of interest 
 - Outputs:
   - Modified `fort.13` with nodal attribute (`swan_local_control`) defining active nodes and internal source nodes
   - `station_locations.csv` containing internal source node locations (at every new 'boundary' node of partial domain)  
@@ -120,7 +123,7 @@ Use this approach if **no spectra currently exist**.
 - Use `adcprep` as usual
 - Use `station_locations.csv` with `update26.py` to:
   - Insert local commands into SWAN input file (`fort.26`) to **output spectra at internal source nodes**
-- This produces spectral files: bnd<xxxx>.spc
+- Upon running, this produces spectral files: bnd<xxxx>.spc
 
 #### Step 3: Run Partial Domain Simulation
 - Use the modified `fort.13` from Step 1  
