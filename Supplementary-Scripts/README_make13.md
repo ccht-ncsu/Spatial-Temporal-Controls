@@ -1,29 +1,40 @@
 # make13.py - SWAN Local Control & Internal Source Node Identification
 
 **Author:** Nicole Arrigo  \
-**Last Updated:** January 20, 2026
+**Last Updated:** March, 2026
 
 ---
 
 ## Overview
-This script identifies and assigns *selective regions of the mesh to run SWAN*. 
-It does this by taking a user-defined polygon, identifying the mesh vertices inside that polygon, and also identifying *internal source nodes* (as locations to apply spectral boundary conditions) on the boundaries of that polygon. 
-It produces an updated nodal attribute file (`fort.13`) containing a new attribute (`swan_local_control`) identifying active and inactive nodes and nodes to apply spectral sources and a CSV summarizing this internal source node information.
+To use the SWAN spatial controls, this script is necessary to identify and assign a *selective region of the mesh to run SWAN*. When running a nearshore SWAN simulation, spectral 'boundary' inputs can account for offshore generated swell wave energy and will help to preserve the accuracy of a partial domain simulation. These spectra can come from another wave model, wave buoy data, or a previous ADCIRC+SWAN full domain simulation.  
+
+This script takes a user-defined polygon, representing the region where SWAN should be active, and also identifies *internal source nodes* (as locations to apply spectral boundary conditions) on the boundaries of that polygon (either in user-provided locations or at every boundary node). It produces an updated nodal attribute file (`fort.13`) containing a new attribute (`swan_local_control`) identifying active and inactive nodes and nodes to apply spectral sources and a CSV summarizing this internal source node information.
 
 ---
 
 ## Intended Use Cases
 
 - Running SWAN on a *partial domain* of a larger ADCIRC mesh
-- Applying **input boundary spectra** only along selected internal sources
-- Generating internal source locations for **SLC-based SWAN simulations**
+   - Applying **input boundary spectra** only along selected internal sources
+   - Generating internal source locations for **partial domain SWAN simulations**
+
+---
+
+## Expected Results 
+
+The following image displays what a modified `fort.13` file would include for `swan_local_control`. 
+
+<img width="1716" height="600" alt="Untitled (5 72 x 2 in) (1)" src="https://github.com/user-attachments/assets/beaeb4a4-6765-4a65-b489-d7dd9b2b31a6" />
+
+*Figure 1. Active SWAN nodes within the EC95 ADCIRC mesh based on user-specified polygon. Green elements correspond to areas of the mesh where SWAN is activated and red dots represent nodes where internal source spectra are applied as 'boundary conditions' for the partial domain.*
+
 
 ---
 
 The workflow supports **two operational modes** for defining internal source nodes:
 
-1. **Geometry-based (no CSV provided):** Internal source nodes are identified using neighboring nodes of partial domain.
-2. **Station-based (CSV provided):** Internal source nodes are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station.
+1. **Boundary node based (no CSV provided):** Internal source nodes are identified based on the boundaries of the partial domain. These locations are summarized in a CSV and this would be used in a full domain simulation to output spectra at these locations (using update26.py). 
+2. **Station-based (CSV provided):** Internal source node locations are selected by user, specifying station locations (lon/lat) and finding the nearest mesh nodes to each station. This would be the case when input spectra already exist from a buoy or another wave model simulation.
 
 This enables flexible SWAN simulations, allowing for the **SWAN Local Control (SLC)** attribute to enable partial-domain SWAN runs and interior boundry conditions (internal sources).
 
@@ -62,11 +73,13 @@ This enables flexible SWAN simulations, allowing for the **SWAN Local Control (S
 - **Internal Source CSV**
   - Node IDs used as internal SWAN sources
   - Associated station names and coordinates
-  - This can be used with the make26.py code for cases of exporting spectra
+  - This can be used with the update26.py code for cases of exporting spectra
 
 ---
 
 ## Methodology
+
+The following steps demonstrate how the script works internally. To run the script, the user only needs to define the polygon vertices of the region of interest and specify whether internal sources are existing or need to be generated. 
 
 ### Step 1: User Inputs
 - Read required files and user-defined parameters
@@ -102,25 +115,14 @@ This approach is typically used when:
 
 This approach is typically used when:
 - Boundary spectra already exist
-- Stations are intended to act as **internal SWAN forcing points** in an SLC simulation
+- Stations are intended to act as **internal SWAN forcing points** in an partial simulation
 
 ### Step 6: Write Updated `fort.13`
 - Append the `swan_local_control` nodal attribute
 - Preserve existing nodal attributes and formatting
 
 ### Step 7: Write Output CSV
-- Save internal source node IDs and associated metadata
-
----
-
-## Expected Results 
-
-The following image displays what a modified `fort.13` file would include for `swan_local_control`. 
-
-<img width="1716" height="600" alt="Untitled (5 72 x 2 in) (1)" src="https://github.com/user-attachments/assets/beaeb4a4-6765-4a65-b489-d7dd9b2b31a6" />
-
-*Figure 1. Active SWAN nodes within the EC95 ADCIRC mesh based on user-specified polygon. Green elements correspond to areas of the mesh where SWAN is activated and red dots represent nodes where internal source spectra are applied as 'boundary conditions' for the partial domain.*
-
+- Save internal source node IDs and locations
 
 ---
 
