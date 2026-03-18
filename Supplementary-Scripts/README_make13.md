@@ -6,8 +6,9 @@
 ---
 
 ## Overview
-This script identifies and assigns *selective regions of the mesh to run SWAN* and *internal source nodes* (as locations to apply spectral boundary conditions) using a user-defined polygon. It produces an updated nodal attribute file (`fort.13`) containing a new attribute (`swan_local_control`) identifying active and inactive nodes and nodes to apply spectral sources at and a CSV summarizing this internal source node information.
-
+This script identifies and assigns *selective regions of the mesh to run SWAN*. 
+It does this by taking a user-defined polygon, identifying the mesh vertices inside that polygon, and also identifying *internal source nodes* (as locations to apply spectral boundary conditions) on the boundaries of that polygon. 
+It produces an updated nodal attribute file (`fort.13`) containing a new attribute (`swan_local_control`) identifying active and inactive nodes and nodes to apply spectral sources and a CSV summarizing this internal source node information.
 
 ---
 
