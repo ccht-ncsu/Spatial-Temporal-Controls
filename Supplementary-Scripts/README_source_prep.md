@@ -6,7 +6,7 @@
 ---
 
 ## Overview
-This script prepares *SWAN internal source boundary commands* for parallel SWAN+ADCIRC simulations. It reads internal source node information from the ADCIRC nodal attribute file (`fort.13`) and assigns each source node to its corresponding *subdomain partition (PE folder)* after domain decomposition has been run using the `partmesh.txt` file.
+This script works specifically for the spatial control workflow to prepare *SWAN internal source boundary commands* for parallel SWAN+ADCIRC simulations. It reads internal source node information from the *modified* (with the make13.py script) ADCIRC nodal attribute file (`fort.13`) and assigns each source node to its corresponding *subdomain partition (PE folder)* after domain decomposition has been run using the `partmesh.txt` file.
 
 For each subdomain folder, the script generates a *local SWAN input file (`fort.26`)* containing the required `BOUndspec` commands that specify spectral forcing. The script then copies the generated files into the corresponding subdomain directories.
 
@@ -16,8 +16,18 @@ This automates the preparation of *local SWAN input files* when running parallel
 
 ## Intended Use Cases
 
-- Running SWAN on a *partial domain* of a larger ADCIRC mesh
-- Applying **input boundary spectra** only along selected internal sources
+- Running SWAN on a *partial domain* of a larger ADCIRC mesh and applying **input boundary spectra** only along selected internal sources
+  - Using the SWAN Local Control nodal attribute from the modified `fort.13` file
+
+---
+
+## Expected Results 
+
+The following image displays a decomposed mesh domain and a series of internal source nodes. Each partition would receive it's own set of local boundary spectra commands corresponding to the internal sources contained in that partition.  
+
+<img width="1716" height="600" alt="Untitled (5 72 x 2 in)" src="https://github.com/user-attachments/assets/937db87d-6944-48b5-82bd-b36390e3b280" />
+
+*Figure 1. Internal source nodes within different mesh partitions. Each internal source node would have boundary spectra input commands placed in the local SWAN input files for each partition.*
 
 ---
 
@@ -42,6 +52,7 @@ BOUndspec SIDE <side> CONstant FILE 'bnd<node>.spc' 1
 
 ## Methodology
 
+The following steps demonstrate how the script works internally. To run the script, the user only needs to first run adcprep to decompose the mesh and then run source_prep.py with the modified `fort.13`. The script will automatically write and move the commands to local SWAN input files.  
 
 ### Step 1: Extract Internal Source Nodes
 - Reads the `swan_local_control` attribute from the `fort.13` file and identifies nodes marked as internal sources.
