@@ -1,4 +1,4 @@
-# update26.py - ADCIRC Spectral Output & PE Station Mapping
+# update26.py - Spectral Output & PE Station Mapping
 
 **Author:** Nicole Arrigo \
 **Last Updated:** March 11, 2026 
@@ -6,16 +6,23 @@
 ---
 
 ## Overview
-This script identifies which ADCIRC mesh element and Processing Element (PE) partition owns specific observation stations based on their longitude/latitude. It creates localized `fort.26` files for parallel partitions, ensuring that each processor only tracks the stations physically located within its sub-domain.
+This script can be used to efficiently output spectral files. Given a list of station coordinates, it identifies which ADCIRC Processing Element (PE) partition contains each station and creates localized SWAN input files (`fort.26`) for each parallel partition. This ensures that each partition only contains the commands to export wave spectra at the stations physically located within its sub-domain.
 
 ---
 
 ## Intended Use Cases
-Use this script when:
-- Mapping a list of global station coordinates to specific ADCIRC parallel partitions.
-- Generating partition-specific `fort.26` files before high-performance computing runs.
-- Handling nodes near partition boundaries where a station might technically sit between multiple PEs.
-- Standardizing spectral output formatting across large-scale mesh datasets.
+- Outputting wave spectra from an ADCIRC+SWAN simulation using a CSV of stations and their locations.
+   - This is useful when outputting spectral files for any use.
+   - Also used for outputting spectra from a full domain simulation for 'boundary nodes' of a partial domain. 
+---
+
+## Expected Results
+
+The following image displays a decomposed mesh domain and a series of stations where the user intends to output wave spectra. Each partition would receive it's own set of local 'SPECout' commands corresponding to the stations contained in that partition.  
+
+<img width="1716" height="600" alt="Untitled (5 72 x 2 in) (1)" src="https://github.com/user-attachments/assets/e2be79eb-1dc4-4033-ab08-9f2e9cdb375a" />
+
+*Figure 1. Stations within different mesh partitions. Each station would have spectral output commands placed in the local SWAN input files for each partition.*
 
 ---
 ## Operational Modes
@@ -85,6 +92,8 @@ The script can be executed via the command line with flexible argument passing:
 
 ## Methodology
 
+The following steps demonstrate how the script works internally. To run the script, the user only needs to first run adcprep to decompose the mesh and then run update26.py with the station_locations.csv file and specified parameters. The script will automatically write and move the commands to local SWAN input files.  
+
 ### Step 1: Read Mesh Files
 - Reads through `fort.14` to load node coordinates and create element-to-nodes connections.
 - Creates a reverse-lookup dictionary of elements touching each node.
@@ -107,15 +116,6 @@ For each station:
 ### Step 4: Write Outputs
 - Writes the `pe_output.csv` summary.
 - Generates formatted `fort.26` files for each PE that contains at least one station by injecting formatted `POINTS` and `SPECOUT` lines while preserving the configuration from `fort.26` file used as an input. 
-
----
-
-## Validation Test Case
-A test case was created using 425 observation stations distributed throughout the EC95 mesh to ensure success across many elements and PE partitions.
-
-<img width="975" height="567" alt="image" src="https://github.com/user-attachments/assets/ec032387-7972-469a-ac0a-32f33439d9b4" />
-
-*Figure 1. Decomposition of the EC95 ADCIRC mesh across 128 processor cores. Colored triangular elements indicate PE partitions, while black markers show the spatial distribution of the 425 observation stations used in the test case.*
 
 ---
 
