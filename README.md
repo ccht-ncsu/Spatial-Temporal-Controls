@@ -35,3 +35,12 @@ The supplementary scripts are necessary to use the spatial controls and more det
 
 <img width="326" height="398" alt="cases" src="https://github.com/user-attachments/assets/d9db8fa4-d9e4-439e-90f4-653ceb96c6c7" />
 
+## Contact
+
+For questions or modifications, please contact:
+
+**Nicole Arrigo**  \
+North Carolina State University - Coastal & Computational Hydraulics Team  \
+Email: nkarrigo@ncsu.edu
+
+---
