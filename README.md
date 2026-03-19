@@ -11,7 +11,7 @@ Previously, it was required that SWAN would compute for the entire timeframe of 
 Now, the user can control SWAN to compute only for a portion of the simulation, thus allowing for an efficiency gain when SWAN is idle.
 
 There are two changes that need to be made to use the temporal controls.
-1. On the ADCIRC input side - the namelist `SWANTimeControl' must be used and the `RunStartDateTime' must be set with the start of the current ADCIRC simulation at the end of the ADCIRC model control file (`fort.15`).
+1. On the ADCIRC input side - the namelist `SWANTimeControl` must be used and the `RunStartDateTime` must be set with the start of the current ADCIRC simulation at the end of the ADCIRC model control file (`fort.15`).
 
 ```bash
 &SWANTimeControl RunStartDateTime='20180907.000000' /
