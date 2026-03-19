@@ -14,9 +14,9 @@ This script takes a user-defined polygon, representing the region where SWAN sho
 
 ## Intended Use Cases
 
-- Running SWAN on a *partial domain* of a larger ADCIRC mesh
-   - Applying **input boundary spectra** only along selected internal sources
-   - Generating internal source locations for **partial domain SWAN simulations**
+- Running SWAN on a *partial domain* of a larger ADCIRC mesh. This script will add a new nodal attribute to a `fort.13` file to indicate which vertices should be included in the computations. It can also do one or both of the following optional tasks:
+   - Applying **input boundary spectra** only along selected internal sources. If the user has wave spectra (either from another SWAN simulation, or from a buoy), then this script will find the nearest ADCIRC mesh vertices and mark them as sources where those spectra will be applied during the simulation.
+   - Generating internal source locations for **partial domain SWAN simulations**. If the user wants to output wave spectra along the edge of the active region (e.g. to use as sources in a follow-on simulation), then this script will identify the ADCIRC mesh vertices along that edge and write files that can be used to control the output of wave spectra (by using the `update26.py` script in this repository).
 
 ---
 
