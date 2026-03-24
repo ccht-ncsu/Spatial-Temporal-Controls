@@ -6,8 +6,8 @@
 
 #### Workflow for Spatial Controls 
 
-- Step 1 - make13.py 
-- Step 2 - update26.py (only if obtaining spectra from a full domain simulation)
-- Step 3 - source_prep.py 
+There isn't one single workflow when using the spatail controls. The steps are dependent on the source of input spectra as displayed below.  
+
+<img width="326" height="398" alt="cases" src="https://github.com/user-attachments/assets/d9db8fa4-d9e4-439e-90f4-653ceb96c6c7" />
 
 ---
