@@ -1,7 +1,7 @@
 # source_prep.py - SWAN Spectral Input Command Generator 
 
 **Author:** Nicole Arrigo  \
-**Last Updated:** March 12, 2026
+**Last Updated:** March 2026
 
 ---
 
@@ -50,9 +50,18 @@ BOUndspec SIDE <side> CONstant FILE 'bnd<node>.spc' 1
 ```
 ---
 
+## How To Use
+
+1. **Mesh Decomposition:** First run `adcprep` to decompose the mesh into a given number of partitions.
+   - This should be run using the modified `fort.13` with the SWAN Local Control attribute defined. 
+
+2. **Execute Code:** `python source_prep.py`
+   - The script will automatically write and move the commands to local SWAN input files.   
+---
+
 ## Methodology
 
-The following steps demonstrate how the script works internally. To run the script, the user only needs to first run adcprep to decompose the mesh and then run source_prep.py with the modified `fort.13`. The script will automatically write and move the commands to local SWAN input files.  
+The following steps demonstrate how the script works internally. 
 
 ### Step 1: Extract Internal Source Nodes
 - Reads the `swan_local_control` attribute from the `fort.13` file and identifies nodes marked as internal sources.
