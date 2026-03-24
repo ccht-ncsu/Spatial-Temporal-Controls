@@ -1,5 +1,5 @@
 # Spatial-Temporal-Controls
-SWAN+ADCIRC supplementary scripts and example of spatial and temporal controls. 
+ADCIRC+SWAN supplementary scripts and example of spatial and temporal controls. 
 With these controls, the user can specify exactly when and where SWAN will perform its computations during a coupled ADCIRC+SWAN simulation. 
 Instead of having to run SWAN on the full mesh and for the entire timeframe, the user can limit SWAN to a spatial region near landfall and a temporal duration at the height of the storm. 
 These controls have the potential to speed-up the overall simulation, without much sacrifice in accuracy.
