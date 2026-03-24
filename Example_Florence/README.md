@@ -63,10 +63,8 @@ In this configuration:
 - SWAN runs over the **entire ADCIRC mesh**
 - The simulation covers the **entire storm duration**
 
-Run the model using the SWAN+ADCIRC executable:
-```bash
-padcswan
-```
+Run the model as you usually would using the ADCIRC+SWAN executable `padcswan`
+
 ---
 
 ## Case 2: Partial Time Simulation
@@ -139,10 +137,7 @@ Use this approach if **no spectra currently exist**.
 - Run `adcprep`  
 - Run `source_prep.py` to:
   - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
-- Run:
-```bash
-padcswan
-```
+- Run `padcswan`
 
 ### Case 3b: Use Predefined Internal Source Locations and Spectra 
 
@@ -159,10 +154,7 @@ Use this approach if **spectra already exist** (e.g., from another model, simula
 - Run `adcprep`  
 - Run `source_prep.py` to:
   - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
-- Run:
-```bash
-padcswan
-```
+- Run `padcswan`
 
 Both simulations will result in a partial spatial domain with spectral boundary forcings to account for offshore swell. 
 
@@ -177,7 +169,7 @@ To run this configuration:
 - Use make13.py with the desired spatial region and intrnal source settings (following the steps to obtain source spectra from a full domain simulation, if needed).
 - With the modified nodal attribute file (`fort.13`), input spectra, and timing updated SWAN input file (`fort.26`), run ADCPREP to decompose the mesh.
 - Next, run source_prep.py to ditribute the boundary spectra commands locally.
-- Run PADCSWAN for the partial spatial and temporal SWAN domain.   
+- Run `padcswan` for the partial spatial and temporal SWAN domain.   
 
 
 ---
