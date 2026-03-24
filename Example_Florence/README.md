@@ -7,7 +7,7 @@
 
 ## Overview
 
-The objective of this example is to demonstrate how to run **SWAN+ADCIRC simulations** using the EC95 mesh for Hurricane Florence (2018) to explore **different spatial and temporal modeling configurations**.
+The objective of this example is to demonstrate how to run **ADCIRC+SWAN simulations** using the EC95 mesh for Hurricane Florence (2018) to explore **different spatial and temporal modeling configurations**.
 
 This example illustrates how the same model setup can be adapted to run:
 
@@ -119,7 +119,7 @@ Use this approach if **no spectra currently exist**.
 - Escpecially useful in engineering design when running repeated scenarios for design alternatives
 
 #### Step 1: Define Partial Domain
-- Run `make13.py` with a user-defined polygon of the region of interest 
+- Run `python make13.py` with a user-defined polygon of the region of interest 
 - Outputs:
   - Modified `fort.13` with nodal attribute (`swan_local_control`) defining active nodes and internal source nodes
   - `station_locations.csv` containing internal source node locations (at every new 'boundary' node of partial domain)  
@@ -127,7 +127,7 @@ Use this approach if **no spectra currently exist**.
 #### Step 2: Export Spectra from Full Domain Simulation
 - Run a **full domain SWAN+ADCIRC simulation**
 - Use `adcprep` as usual
-- Use `station_locations.csv` with `update26.py` to:
+- Use `station_locations.csv` with `python update26.py` to:
   - Insert local commands into SWAN input file (`fort.26`) to **output spectra at internal source nodes**
 - Upon running, this produces spectral files: bnd<xxxx>.spc
 
@@ -135,7 +135,7 @@ Use this approach if **no spectra currently exist**.
 - Use the modified `fort.13` from Step 1  
 - Include the generated spectral files (`bndXXXX.spc`)  
 - Run `adcprep`  
-- Run `source_prep.py` to:
+- Run `python source_prep.py` to:
   - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
 - Run `padcswan`
 
@@ -144,7 +144,7 @@ Use this approach if **no spectra currently exist**.
 Use this approach if **spectra already exist** (e.g., from another model, simulation, or observations).
 
 #### Step 1: Define Internal Sources and Patial Domain
-- Run `make13.py` with a user-defined polygon and internal_sources.csv with station locations (lon/lat). 
+- Run `python make13.py` with a user-defined polygon and internal_sources.csv with station locations (lon/lat). 
 - Outputs:
   - Modified `fort.13` with nodal attribute (`swan_local_control`) defining active nodes and internal source nodes
 
@@ -152,7 +152,7 @@ Use this approach if **spectra already exist** (e.g., from another model, simula
 - Use the modified `fort.13` from Step 1  
 - Include spectral files to be used as input sources (`bndXXXX.spc`)  
 - Run `adcprep`  
-- Run `source_prep.py` to:
+- Run `python source_prep.py` to:
   - Insert local boundary condiiton commands (`BOUndspec`) into each PE-specific `fort.26`  
 - Run `padcswan`
 
@@ -166,9 +166,12 @@ This configuration combines both opitmizations and represents a **partial spatia
 
 To run this configuration:
 - Define the SWAN compute time in the SWAN input file (`fort.26`)
-- Use make13.py with the desired spatial region and intrnal source settings (following the steps to obtain source spectra from a full domain simulation, if needed).
-- With the modified nodal attribute file (`fort.13`), input spectra, and timing updated SWAN input file (`fort.26`), run ADCPREP to decompose the mesh.
-- Next, run source_prep.py to ditribute the boundary spectra commands locally.
+```bash
+COMPUTE 20180912.000000 1200 SEC 20180916.000000
+```
+- Use `python make13.py` with the desired spatial region and intrnal source settings (following the steps to obtain source spectra from a full domain simulation, if needed).
+- With the modified nodal attribute file (`fort.13`), input spectra, and timing updated SWAN input file (`fort.26`), run `adcprep` to decompose the mesh.
+- Next, run `python source_prep.py` to ditribute the boundary spectra commands locally.
 - Run `padcswan` for the partial spatial and temporal SWAN domain.   
 
 
