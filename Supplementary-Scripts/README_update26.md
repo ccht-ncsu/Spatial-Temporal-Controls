@@ -1,6 +1,6 @@
 # update26.py - Spectral Output & PE Station Mapping
 
-**Author:** Nicole Arrigo \
+**Authors:** Nicole Arrigo, Katherine Couch \
 **Last Updated:** March 11, 2026 
 
 ---
@@ -18,7 +18,7 @@ This script can be used to efficiently output spectral files. Given a list of st
 
 ## Expected Results
 
-The following image displays a decomposed mesh domain and a series of stations where the user intends to output wave spectra. Each partition would receive it's own set of local 'SPECout' commands corresponding to the stations contained in that partition.  
+The following image displays a decomposed mesh domain and a series of stations where the user intends to output wave spectra. Each partition would receive it's own set of local `SPECout` commands corresponding to the stations contained in that partition.  
 
 <img width="1716" height="600" alt="Untitled (5 72 x 2 in) (1)" src="https://github.com/user-attachments/assets/e2be79eb-1dc4-4033-ab08-9f2e9cdb375a" />
 
@@ -92,30 +92,47 @@ The script can be executed via the command line with flexible argument passing:
 
 ## Methodology
 
-The following steps demonstrate how the script works internally. To run the script, the user only needs to first run adcprep to decompose the mesh and then run update26.py with the station_locations.csv file and specified parameters. The script will automatically write and move the commands to local SWAN input files.  
+The following steps describe how the script works internally. To run the script, the user only needs to first run adcprep to decompose the mesh and then run update26.py with the station_locations.csv file and specified parameters. The script will automatically write and move the commands to local SWAN input files.  
+
+The following steps describe how the script operates internally. To run the script, the user must first execute `adcprep` to decompose the mesh, and then run `update26.py` using the `station_locations.csv` file along with the specified parameters. The script will automatically generate and insert the required commands into the local SWAN input (`fort.26`) files.
 
 ### Step 1: Read Mesh Files
-- Reads through `fort.14` to load node coordinates and create element-to-nodes connections.
-- Creates a reverse-lookup dictionary of elements touching each node.
+- Reads `fort.14` to load node coordinates and construct element-to-nodes connectivity.
+- Creates a reverse-lookup dictionary of elements connected each node.
 - Reads `partmesh.txt` to determine which PE each node belongs to.
 
-### Step 2: Spatial Search
-For each station:
-- It identifies the $k$ nearest nodes using a priority queue (`heapq`).
-- If a station is within a very small threshold ($10^{-5}$) of a node, it is assigned directly to that node's PE, skipping over logic in Step 3. 
-- If not, the search radius ($k$) and tolerance ($\epsilon$) expand dynamically until an enclosing element is found.
+*Steps 2-4 are repeated for each station:*
 
-### Step 3: PE Assignment 
-- The script identifies the three nodes forming the enclosing element.
-- It checks the PE assignment for each node via `partmesh.txt`.
-- If all three nodes have matching PE, then assign to that PE.
-- If the nodes belong to different PEs, when stationss mear partition boundaries creating ghost node/edge case, the station is assigned to the PE that owns the majority of the element's nodes.
-  
+### Step 2: Nearest Node Search
+- Identifies the $k$ nearest nodes using a priority queue (`heapq`).
 
+### Step 3: Identify Containing Element
+- Uses the nearby nodes to collect candidate elements.
+- Computes the centroid of each candidate element and selects the element whose centroid is closest to the station.
+- Verifies that the station lies within the selected element.
+- If not, Steps 2–3 are repeated with a larger $k$ value.
 
-### Step 4: Write Outputs
-- Writes the `pe_output.csv` summary.
-- Generates formatted `fort.26` files for each PE that contains at least one station by injecting formatted `POINTS` and `SPECOUT` lines while preserving the configuration from `fort.26` file used as an input. 
+### Step 4: PE Assignment 
+Once the containing element is identified, the script determines which PE the station belongs to.
+
+The assignment is based on three cases: 
+
+ * **Case 1:** The station lies exactly on a node (within a small threshold ($10^{-5}$)).
+   * The station is assigned to the same PE as that node.
+ * **Case 2:** The station lies within an element whose nodes all belong to the same PE.
+   * The station is assigned to that PE.
+ * **Case 3:** The station lies within an element whose nodes belong to different PEs.
+   * The script finds the nearest node and assigns the station to that node's PE. 
+Node-to-PE assignments are determined using `partmesh.txt`.
+
+<img width="600" height="300" alt="image" src="https://github.com/user-attachments/assets/572c19b4-d8cd-4ace-b6ca-6c03010478b9" />
+
+*Figure 2. Illustration of the three PE assignment cases described in Step 4.*
+
+### Step 5: Write Outputs
+- Writes a summary file: `pe_output.csv`.
+- Generates updated `fort.26` files for each PE containing at least one station by injecting formatted `POINTS` and `SPECOUT` lines.
+- Preserves the original configuration of the input `fort.26` files. 
 
 ---
 
