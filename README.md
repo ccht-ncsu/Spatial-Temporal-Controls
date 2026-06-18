@@ -34,7 +34,49 @@ This control has been added to give flexibility to the user to simulate SWAN for
 Previously, it was required that SWAN would compute on the full ADCIRC mesh, which again was inefficient in regions far from the storm. 
 Now, the user can specify a region for the SWAN computations, such as a portion of the coastal ocean near landfall, thus allowing for an efficency gain in the regions where SWAN is idle.
 
-The supplementary scripts are necessary to use the spatial controls, and more detail is provided on each script. This workflow supports running SWAN over a selective spatial domain using internal source spectra to account for offshore swell enegery, with flexibility depending on whether the boundary spectra already exist or must be generated.
+There are several changes that need to be made to use the spatial controls.
+1. On the ADCIRC input side - the nodal attribute `swan_local_control` must be added and accounted for in the ADCIRC model control file (`fort.15`).
+
+```bash
+ 3                         ! NWP 
+sea_surface_height_above_geoid
+mannings_n_at_sea_floor
+swan_local_control
+```
+The nodal attribute must be added to the nodal attributes file (`fort.13`) with the default values and non-default nodes.
+
+```bash
+swan_local_control
+ 1
+ 2
+ 1 0
+```
+
+```bash
+swan_local_control
+ 54
+ 973 0 0
+ 977 1 8
+ 978 0 0
+ 980 1 9
+ ```
+Each node that is inactive or an internal source node (non-deault) is listed. 
+- In the example above, 54 nodes are non-defaults with node 973 and 978 being inactive vertices and nodes 977 and 980 being set as internal sources.
+
+2. On the SWAN input side - input commands to apply spectra must be set in the SWAN input file (`fort.26`) for each internal source node. Each internal source spectral file should be in the main simulation directory. 
+- For example, to apply the spectral file `bnd977.spc` at internal source node 977 (side 8), the following command is needed.
+
+```bash
+BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
+$
+BOUndspec SIDE 8 CONstant FILE 'bnd977.spc' 1
+BOUndspec SIDE 9 CONstant FILE 'bnd980.spc' 1
+BOUndspec SIDE 10 CONstant FILE 'bnd984.spc' 1
+```
+
+This will result in SWAN running in a limited spatial domain with internal spectra applied at the desired locations. 
+
+The supplementary scripts are helpful tools when using the spatial controls, and more detail is provided on each script. This workflow supports running SWAN over a selective spatial domain using internal source spectra to account for offshore swell enegery, with flexibility depending on whether the boundary spectra already exist or must be generated.
 
 #### Workflow
 
