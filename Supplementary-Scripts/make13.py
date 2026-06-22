@@ -95,6 +95,7 @@ fort14 = []
 node_list = []
 element_list = []
 boundary_nodes = set()
+land_boundary_nodes = set()
 
 with open("fort.14", 'r') as file:
     next(file)  # skip header line 1
@@ -166,6 +167,7 @@ with open("fort.14", 'r') as file:
         for _ in range(NVELL):
             node_num = int(file.readline().split()[0])
             #boundary_nodes.add(node_num)
+            land_boundary_nodes.add(node_num)
 
     total_boundary_segments = NOPE + NBOU
 
@@ -256,6 +258,7 @@ if internal_source_csv is None:
         node
         for node in nodes_within_polygon
         if neighbors[node] & nodes_not_within_polygon_set
+        and node not in land_boundary_nodes
     ]
 else:
     # case 2: CSV provided - find nearest node to each station
