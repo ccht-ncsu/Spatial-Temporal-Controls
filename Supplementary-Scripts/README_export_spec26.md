@@ -1,7 +1,7 @@
-# update26.py - Spectral Output & PE Station Mapping
+# export_spec26.py - Spectral Output & PE Station Mapping
 
 **Authors:** Nicole Arrigo, Katherine Couch \
-**Last Updated:** March 11, 2026 
+**Last Updated:** September 23, 2026 
 
 ---
 
@@ -29,11 +29,11 @@ The following image displays a decomposed mesh domain and a series of stations w
 
 The script can be executed via the command line with flexible argument passing:
 
-1. **Positional Mode:** `python update26.py [DATE] [PRINT_GLOBAL] [TIMESTEP] [SPEC_DIM]`
-   > *Example:*   `python update26.py 20181006.000000 true 1800 2D`
+1. **Positional Mode:** `python export_spec26.py [DATE] [PRINT_GLOBAL] [TIMESTEP] [SPEC_DIM]`
+   > *Example:*   `python export_spec26.py 20181006.000000 true 1800 2D`
    
-2. **Flag Mode:** `python update26.py --date=0.0 --global=true --timestep=1800 --spec_dim=2D`
-   > *Example:*    `python update26.py --date=20181006.000000`
+2. **Flag Mode:** `python export_spec26.py --date=0.0 --global=true --timestep=1800 --spec_dim=2D`
+   > *Example:*    `python export_spec26.py --date=20181006.000000`
 
 *Note: `DATE` is a required input.*
 
