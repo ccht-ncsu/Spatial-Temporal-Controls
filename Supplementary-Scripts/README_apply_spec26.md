@@ -1,4 +1,4 @@
-# source_prep.py - SWAN Spectral Input Command Generator 
+# apply_spec26.py - SWAN Spectral Input Command Generator 
 
 **Author:** Nicole Arrigo  \
 **Last Updated:** March 2026
@@ -6,9 +6,11 @@
 ---
 
 ## Overview
-This script works specifically for the spatial control workflow to prepare *SWAN internal source boundary commands* for parallel SWAN+ADCIRC simulations. It reads internal source node information from the *modified* (with the make13.py script) ADCIRC nodal attribute file (`fort.13`) and assigns each source node to its corresponding *subdomain partition (PE folder)* after domain decomposition has been run using the `partmesh.txt` file.
+This script works specifically for the spatial control workflow to prepare *SWAN internal source boundary commands* for parallel SWAN+ADCIRC simulations. It reads internal source node information from the *modified* (with the update13.py script) ADCIRC nodal attribute file (`fort.13`) and assigns each source node to its corresponding *subdomain partition (PE folder)* after domain decomposition has been run using the `partmesh.txt` file.
 
 For each subdomain folder, the script generates a *local SWAN input file (`fort.26`)* containing the required `BOUndspec` commands that specify spectral forcing. The script then copies the generated files into the corresponding subdomain directories.
+
+#### The `BOUndspec` commands are based off of SWAN's Boundary and Initial Conditions formatting (`https://swanmodel.sourceforge.io/online_doc/swanuse/node27.html`). The code currently uses a default JONSWAP spectrum and applies a 2D spectra from a SWAN file but variations can be made accordingly for each use case.   
 
 This automates the preparation of *local SWAN input files* when running parallel simulations with internal source spectra.
 
