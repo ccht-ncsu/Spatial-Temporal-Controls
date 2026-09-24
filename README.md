@@ -1,12 +1,15 @@
 # Spatial-Temporal-Controls
-ADCIRC+SWAN supplementary scripts and example of spatial and temporal controls. 
-With these controls, the user can specify exactly when and where SWAN will perform its computations during a coupled ADCIRC+SWAN simulation. 
+SWAN+ADCIRC spatial and temporal controls - supplementary scripts and example test case 
+
+#### *Note:* These controls require ADCIRC Version 56.2.1 or later. 
+
+With these controls, the user can specify exactly when and where SWAN will perform its computations during a coupled SWAN+ADCIRC simulation. 
 Instead of having to run SWAN on the full mesh and for the entire timeframe, the user can limit SWAN to a spatial region near landfall and a temporal duration at the height of the storm. 
 These controls have the potential to speed-up the overall simulation, without much sacrifice in accuracy.
 
 ## Temporal Controls 
 
-This control has been added to give flexibility to the user to simulate SWAN for a **unique timeframe** within the ADCIRC+SWAN simulation. 
+This control has been added to give flexibility to the user to simulate SWAN for a **unique timeframe** within the SWAN+ADCIRC simulation. 
 Previously, it was required that SWAN would compute for the entire timeframe of the simulation, which was inefficient if the storm was far offshore and the waves were small. 
 Now, the user can control SWAN to compute only for a portion of the simulation, thus allowing for an efficiency gain when SWAN is idle.
 
@@ -34,7 +37,9 @@ This control has been added to give flexibility to the user to simulate SWAN for
 Previously, it was required that SWAN would compute on the full ADCIRC mesh, which again was inefficient in regions far from the storm. 
 Now, the user can specify a region for the SWAN computations, such as a portion of the coastal ocean near landfall, thus allowing for an efficency gain in the regions where SWAN is idle.
 
-There are several changes that need to be made to use the spatial controls.
+#### The supplementary scripts provided can assist in the set up of simulations using the spatial controls. 
+
+There are several changes that need to be made to use the spatial controls. 
 1. On the ADCIRC input side - the nodal attribute `swan_local_control` must be added and accounted for in the ADCIRC model control file (`fort.15`).
 
 ```bash
@@ -44,7 +49,7 @@ mannings_n_at_sea_floor
 swan_local_control
 ```
 The nodal attribute must be added to the nodal attributes file (`fort.13`) with the default values and non-default nodes.
-
+#### The update13.py script can assist in adding the nodal attribute and non-default values associated with a `fort.14`.
 ```bash
 swan_local_control
  1
@@ -63,8 +68,9 @@ swan_local_control
 Each node that is inactive or an internal source node (non-deault) is listed. 
 - In the example above, 54 nodes are non-defaults with node 973 and 978 being inactive vertices and nodes 977 and 980 being set as internal sources.
 
-2. On the SWAN input side - input commands to apply spectra must be set in the SWAN input file (`fort.26`) for each internal source node. Each internal source spectral file should be in the main simulation directory. 
-- For example, to apply the spectral file `bnd977.spc` at internal source node 977 (side 8), the following command is needed.
+2. On the SWAN input side - input commands to apply spectra must be set in the SWAN input file (`fort.26`) for each internal source node. 
+#### The apply_spec26.py script can assist in adding the necessary boundary input commands. The script will place them into the corresponding local `fort.26` files for a parallel simulation. 
+- Each internal source spectral file should be in the main simulation directory. For example, to apply the spectral file `bnd977.spc` at internal source node 977 (side 8), the following command is needed.
 
 ```bash
 BOUnd SHAPespec JONswap 3.3 PEAK DSPR DEGRees
@@ -76,7 +82,7 @@ BOUndspec SIDE 10 CONstant FILE 'bnd984.spc' 1
 
 This will result in SWAN running in a limited spatial domain with internal spectra applied at the desired locations. 
 
-The supplementary scripts are helpful tools when using the spatial controls, and more detail is provided on each script. This workflow supports running SWAN over a selective spatial domain using internal source spectra to account for offshore swell enegery, with flexibility depending on whether the boundary spectra already exist or must be generated.
+The supplementary scripts are helpful tools when using the spatial controls, and more detail is provided on each script. This workflow supports running SWAN over a selective spatial domain using internal source spectra to account for offshore swell energy, with flexibility depending on whether the boundary spectra already exist or must be generated.
 
 #### Workflow
 
