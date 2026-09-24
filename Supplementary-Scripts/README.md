@@ -1,8 +1,11 @@
 ## Overview 
 
 - update13.py - to specify desired spatial domain and internal source spectra locations
+  - Produces updated `fort.13`
 - export_spec26.py - to output wave spectra (useful regardless of using spatial controls, beneficial for outputting spectral files efficiently for any purpose)
-- apply_spec26.py - to be used with a modified fort.13 (using the SWAN Local Control nodal attribute) to input spectral boundary conditions 
+  - Produces updated local `fort.26` files
+- apply_spec26.py - to be used with a modified fort.13 (using the SWAN Local Control nodal attribute) to input spectral boundary conditions
+  - Produces updated local `fort.26` files 
 
 #### Workflow for Spatial Controls 
 
