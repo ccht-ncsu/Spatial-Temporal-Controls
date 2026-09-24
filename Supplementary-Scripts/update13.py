@@ -1,8 +1,8 @@
-# make13.py
+# update13.py
 #
 #
 # Author: Nicole Arrigo 
-# Last updated: 1.20.2026
+# Last updated: 9.23.2026
 # Unity ID: nkarrigo
 # Purpose:  Using a polygon, determine the nodes in the fort.14 mesh within the desired region. 
 # Then create a new nodal attribute in fort.13 file so SWAN can be run in selective regions and 
